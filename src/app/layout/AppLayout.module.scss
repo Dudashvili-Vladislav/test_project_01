@@ -1,0 +1,32 @@
+.layout {
+  height: 100vh;
+}
+
+.sider {
+  width: 200px;
+  padding: 16px;
+  background-color: #9da3ad;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  button {
+    width: fit-content;
+  }
+}
+
+.header {
+  padding: 16px;
+  text-align: left;
+  height: 50px;
+  background-color: #bac3cf;
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  padding: 16px;
+}

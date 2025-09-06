@@ -1,0 +1,22 @@
+.item {
+  justify-content: center;
+  gap: 10px;
+  height: 40px;
+  align-items: center;
+}
+
+.title {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.3s ease-in-out;
+
+  &_collapsed {
+    opacity: 0;
+    display: none
+  }
+}

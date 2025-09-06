@@ -1,0 +1,37 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  LOGS_PATH: /home/deploy/logs
+  REGISTRY: registry.gitlab.com/1kkk/b2b/fe-client
+
+build:
+  stage: build
+  rules:
+    - if: $ACTION == 'init'
+      when: always
+  script:
+    - echo ========================= BUILD fe-client:latest =========================z
+    - ~/.deno/bin/deno install --allow-scripts=npm:esbuild@0.15.18,npm:@swc/core@1.7.35
+    - ~/.deno/bin/deno task build
+    - rm -rf /home/gitlab-runner/b2b/static || true
+    - mkdir -p /home/gitlab-runner/b2b
+    - cp -a ./dist /home/gitlab-runner/b2b/static
+    - rm -rf ./node_modules || true
+
+deploy:
+  stage: deploy
+  rules:
+    - if: $ACTION == 'init'
+      when: on_success
+  script:
+    - echo ========================= DEPLOY fe-client:latest =========================
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $B2B_SSH_IP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - scp -i $SSH_PRIVATE_KEY -r /home/gitlab-runner/b2b/static $B2B_SSH_USER@$B2B_SSH_IP:/home/deploy/b2b/static
