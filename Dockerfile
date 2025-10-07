@@ -1,19 +1,19 @@
 FROM node:18-alpine as build
 
-RUN echo "http://mirror.yandex.ru/alpine/v3.21/main" > /etc/apk/repositories && \
-    echo "http://mirror.yandex.ru/alpine/v3.21/community" >> /etc/apk/repositories
-
-# Теперь обновляем списки пакетов и устанавливаем curl и unzip
+# Устанавливаем необходимые пакеты с использованием официальных зеркал
 RUN apk update && apk add --no-cache curl unzip
 
+# Безопасная установка Deno (предпочтительный способ)
+RUN curl -fsSL https://deno.land/x/install/install.sh | sh
 
-# Установка Deno
-RUN curl -fsSL https://deno.land/install.sh | sh
-ENV PATH="/root/.deno/bin:$PATH"
+ENV DENO_INSTALL="/root/.deno/bin"
+ENV PATH="$DENO_INSTALL:$PATH"
 
 WORKDIR /app
-COPY . .
+COPY package*.json ./
 RUN npm install
+
+COPY . .
 RUN npm run build
 
 # --- Финальный этап ---
