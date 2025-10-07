@@ -1,4 +1,3 @@
-# ЭТАП 1: Сборка на основе стандартного образа Node.js
 FROM node:18-alpine as build
 
 WORKDIR /app
@@ -6,8 +5,8 @@ WORKDIR /app
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Устанавливаем зависимости
-RUN npm install
+# Устанавливаем ВСЕ зависимости (включая dev)
+RUN npm install --include=dev
 
 # Копируем остальные файлы проекта
 COPY . .
@@ -15,7 +14,6 @@ COPY . .
 # Собираем проект с помощью Vite
 RUN npm run build
 
-# ЭТАП 2: Финальный образ с Nginx
 FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
