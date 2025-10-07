@@ -1,18 +1,17 @@
-FROM denoland/deno:alpine as deno-setup
-
-FROM node:20-alpine as build
-
-# Копируем Deno из официального образа
-COPY --from=deno-setup /usr/local/bin/deno /usr/local/bin/deno
+FROM denoland/deno:2.0.0 as builder
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-
 COPY . .
-RUN npm run build
 
+# Устанавливаем зависимости и собираем проект
+RUN deno install --allow-scripts=npm:esbuild@0.15.18,npm:@swc/core@1.7.35
+RUN deno task build
+
+# Финальный образ с nginx
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+
+# Копируем собранные файлы из стадии сборки
+COPY --from=builder /app/dist /usr/share/nginx/html
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
