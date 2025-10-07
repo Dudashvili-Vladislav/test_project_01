@@ -1,10 +1,10 @@
 FROM node:18-alpine as build
 
 # Явно меняем зеркало репозитория на альтернативное
-RUN echo "http://mirror.leaseweb.net/alpine/v3.21/main" > /etc/apk/repositories && \
-    echo "http://mirror.leaseweb.net/alpine/v3.21/community" >> /etc/apk/repositories
+RUN echo "http://mirror.nluug.nl/alpine/v3.21/main" > /etc/apk/repositories && \
+    echo "http://mirror.nluug.nl/alpine/v3.21/community" >> /etc/apk/repositories
 
-# Теперь обновляем списки пакетов и устанавливаем curl и unzip
+# Теперь обновляем списки пакетов...
 RUN apk update && apk add --no-cache curl unzip
 
 # Установка Deno
