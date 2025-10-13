@@ -1,13 +1,14 @@
-FROM nginx:alpine
+FROM node:20-alpine as build
 
-# Копируем готовый билд
-COPY dist /usr/share/nginx/html
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
-# Копируем правильный конфиг
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Даем правильные права
-RUN chown -R nginx:nginx /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
